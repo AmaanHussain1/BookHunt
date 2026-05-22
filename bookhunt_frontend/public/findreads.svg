@@ -1,0 +1,20 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="coverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#3B82F6"/>
+            <stop offset="100%" stop-color="#2563EB"/>
+        </linearGradient>
+        <linearGradient id="spineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#1D4ED8"/>
+            <stop offset="100%" stop-color="#1E3A8A"/>
+        </linearGradient>
+    </defs>
+    <!-- Pages stack -->
+    <path d="M12 20L32 10L52 20L32 30L12 20Z" fill="white"/>
+    <path d="M12 20V44L32 54V30L12 20Z" fill="#E0E7FF"/>
+    <path d="M32 10L52 20V44L32 54V10Z" fill="#F3F4F6"/>
+    <!-- Book cover -->
+    <path d="M32 10L52 20V44L32 54V10Z" fill="url(#coverGradient)"/>
+    <!-- Book spine -->
+    <path d="M12 20V44L32 54V30L12 20Z" fill="url(#spineGradient)"/>
+</svg>
