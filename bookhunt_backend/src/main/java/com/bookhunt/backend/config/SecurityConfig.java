@@ -1,10 +1,9 @@
-package com.bookhunt.backend.config;
+package com.bookhunt.backend.config; // Make sure your package name matches!
 
 import com.bookhunt.backend.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,7 +26,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // BCrypt will securely hash passwords.
         return new BCryptPasswordEncoder();
     }
 
@@ -36,14 +34,12 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/**", "/api/auth/**", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session-> session
+                .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 
@@ -52,14 +48,13 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // CORS Configuration to explicitly allow React frontend
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Allow the default React port
+
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173/",
-                "https://bookhunt-teal.vercel.app/"
+                "https://bookhunt-teal.vercel.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
