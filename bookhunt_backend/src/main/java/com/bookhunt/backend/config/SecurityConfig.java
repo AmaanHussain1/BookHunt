@@ -54,7 +54,7 @@ public class SecurityConfig {
         // Allow the default React port
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173/",
-                "https://bookhunt-teal.vercel.app"
+                "https://bookhunt-teal.vercel.app/"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
