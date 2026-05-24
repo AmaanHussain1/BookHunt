@@ -26,7 +26,7 @@ const SignUp = () => {
       setShowOtpForm(true); 
       showNotification('OTP sent to your email!', 'success');
     } catch (e) {
-      const errorMsg = e.response?.data?.message || e.response?.data || 'Failed to create account';
+      const errorMsg = e.response?.data?.message || e.response?.data?.error || "Signup failed. Please try again.";
       setError(errorMsg);
     } finally {
       setLoading(false);
