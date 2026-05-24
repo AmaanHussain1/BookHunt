@@ -19,7 +19,14 @@ public class EmailService {
         message.setSubject("Verify your BookHunt Account!");
         message.setText("Welcome to BookHunt!\n\nYour 6-digit verification code is: " + otp + "\n\nPlease enter this code in the app to activate your account.");
 
-        mailSender.send(message);
+//        mailSender.send(message);
+
+        // Bypassing Render's SMTP Firewall
+        System.out.println("==========================================");
+        System.out.println("🚨 MOCK EMAIL SENT 🚨");
+        System.out.println("To: " + toEmail);
+        System.out.println("Your BookHunt OTP is: " + otp);
+        System.out.println("==========================================");
     }
 
 }
