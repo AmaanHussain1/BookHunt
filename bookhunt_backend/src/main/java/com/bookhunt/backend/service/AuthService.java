@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -22,27 +23,47 @@ public class AuthService {
 
     public String registerUser(SignupRequest request){
 
-        // Checking if username or email already exists
+        Optional<User> existingUserOpt = userRepository.findByEmail(request.getEmail());
+
+        String generatedOtp = String.format("%06d", new Random().nextInt(1000000));
+
+        if (existingUserOpt.isPresent()) {
+            User existingUser = existingUserOpt.get();
+
+            if (existingUser.isVerified()) {
+                throw new RuntimeException("Error: Email is already in use!");
+            } else {
+                // If they are trying to use a completely different username that someone else took
+                if (!existingUser.getUsername().equals(request.getUsername()) && userRepository.existsByUsername(request.getUsername())) {
+                    throw new RuntimeException("Error: Username is already taken!");
+                }
+
+                // Overwrite the unverified user with their new details and new OTP
+                existingUser.setUsername(request.getUsername());
+                existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
+                existingUser.setOtp(generatedOtp);
+
+                userRepository.save(existingUser);
+                emailService.sendOtpEmail(existingUser.getEmail(), generatedOtp);
+
+                return "User updated successfully! Please check your email for the new OTP.";
+            }
+        }
+
+        // NEW USER ENTITY
         if (userRepository.existsByUsername(request.getUsername())){
             throw new RuntimeException("Error: Username is already taken!");
         }
-        if (userRepository.existsByEmail(request.getEmail())){
-            throw new RuntimeException("Error: Email is already in use!");
-        }
 
-        String generatedOtp = String.format("%6d", new Random().nextInt(999999));
-
-        // New user entity
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); // Hashing the password before saving!
-        user.setVerified(false); // NOT VERIFIED YET
-        user.setOtp(generatedOtp); // SAVE THE OTP TO DB
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setVerified(false);
+        user.setOtp(generatedOtp);
 
-        userRepository.save(user); // Save to the database
+        userRepository.save(user);
 
-        // SEND THE EMAIL
         emailService.sendOtpEmail(user.getEmail(), generatedOtp);
 
         return "User registered successfully! Please check your email for the OTP.";
@@ -58,7 +79,7 @@ public class AuthService {
 
         if (otp.equals(user.getOtp())){
             user.setVerified(true);
-            user.setOtp(null); // Clear the OTP so it cannot be reused
+            user.setOtp(null);
             userRepository.save(user);
         } else {
             throw new RuntimeException("Invalid OTP. Please try again.");
@@ -66,7 +87,6 @@ public class AuthService {
     }
 
     public String loginUser(LoginRequest request){
-        // Find the user in the database
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));
 
@@ -74,12 +94,10 @@ public class AuthService {
             throw new RuntimeException("Account not verified. Please verify your email first.");
         }
 
-        // Checking if the raw password matches the database's hashed password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             throw new RuntimeException("Invalid password");
         }
 
-        // Generate the secure JWT token and hand it back
         return jwtUtils.generateToken(user.getUsername());
     }
 }

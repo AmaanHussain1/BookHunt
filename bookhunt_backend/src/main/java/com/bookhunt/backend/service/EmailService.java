@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,6 +18,7 @@ public class EmailService {
     @Value("${brevo.api.key}")
     private String brevoApiKey;
 
+    @Async
     public void sendOtpEmail(String targetEmail, String otp){
         String url = "https://api.brevo.com/v3/smtp/email";
         RestTemplate restTemplate = new RestTemplate();
